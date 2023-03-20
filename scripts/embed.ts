@@ -6,8 +6,19 @@ import { Configuration, OpenAIApi } from "openai";
 
 loadEnvConfig("");
 
+const apikey = process.env.AZURE_OPENAI_APIKEY;
+const baseurl = process.env.AZURE_OPENAI_ENDPOINT;
+const deploymentname = process.env.AZURE_OPENAI_DEPLOYMENT;
+
+let base_url = `${baseurl}openai/deployments/${deploymentname}`;
+//let url = `${baseurl}openai/deployments/${deploymentname}/embeddings?api-version=2022-12-01`;
+
 const generateEmbeddings = async (essays: PGEssay[]) => {
-  const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
+  //const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
+  const configuration = new Configuration({
+    basePath: base_url,
+    apiKey: apikey,
+  });
   const openai = new OpenAIApi(configuration);
 
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
@@ -21,8 +32,16 @@ const generateEmbeddings = async (essays: PGEssay[]) => {
       const { essay_title, essay_url, essay_date, essay_thanks, content, content_length, content_tokens } = chunk;
 
       const embeddingResponse = await openai.createEmbedding({
-        model: "text-embedding-ada-002",
+        deployment: "text-embedding-ada-002",
         input: content
+      },
+      {
+        headers: {
+          "api-key": apikey,
+        },
+        params: {
+          "api-version": "2022-12-01",
+        },
       });
 
       const [{ embedding }] = embeddingResponse.data.data;
