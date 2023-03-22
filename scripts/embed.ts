@@ -5,16 +5,15 @@ import fs from "fs";
 import { Configuration, OpenAIApi } from "openai";
 
 loadEnvConfig("");
-
 const apikey = process.env.AZURE_OPENAI_APIKEY;
 const baseurl = process.env.AZURE_OPENAI_ENDPOINT;
 const deploymentname = process.env.AZURE_OPENAI_DEPLOYMENT;
-
 let base_url = `${baseurl}openai/deployments/${deploymentname}`;
 //let url = `${baseurl}openai/deployments/${deploymentname}/embeddings?api-version=2022-12-01`;
 
 const generateEmbeddings = async (essays: PGEssay[]) => {
   //const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
+  //const openai = new OpenAIApi(configuration);
   const configuration = new Configuration({
     basePath: base_url,
     apiKey: apikey,
@@ -66,7 +65,7 @@ const generateEmbeddings = async (essays: PGEssay[]) => {
         console.log("saved", i, j);
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 800));
     }
   }
 };

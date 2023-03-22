@@ -1,30 +1,15 @@
 import { supabaseAdmin } from "@/utils";
-import { loadEnvConfig } from "@next/env";
-import { Configuration, OpenAIApi } from "openai";
 
 export const config = {
   runtime: "edge"
 };
 
-loadEnvConfig("");
-const apikey = process.env.AZURE_OPENAI_APIKEY;
-//const baseurl = process.env.AZURE_OPENAI_ENDPOINT;
-//const deploymentname = process.env.AZURE_OPENAI_DEPLOYMENT;
-//let base_url = `${baseurl}openai/deployments/${deploymentname}`;
-//let url = `${baseurl}openai/deployments/${deploymentname}/embeddings?api-version=2022-12-01`;
-
 const handler = async (req: Request): Promise<Response> => {
-  
-  // const configuration = new Configuration({
-  //   basePath: base_url,
-  //   apiKey: apikey,
-  // });
-  // const openai = new OpenAIApi(configuration);
 
   try {
-    const { query, userapiKey, matches } = (await req.json()) as {
+    const { query, apiKey, matches } = (await req.json()) as {
       query: string;
-      userapiKey: string;
+      apiKey: string;
       matches: number;
     };
 
@@ -33,7 +18,7 @@ const handler = async (req: Request): Promise<Response> => {
     const res = await fetch("https://textllmapi.openai.azure.com/openai/deployments/text-embedding-ada-002/embeddings?api-version=2022-12-01", {
       headers: {
         "Content-Type": "application/json",
-        "api-key": apikey
+        "api-key": apiKey
       },
       method: "POST",
       body: JSON.stringify({
@@ -41,19 +26,6 @@ const handler = async (req: Request): Promise<Response> => {
         input
       })
     });
-
-    // const res = await openai.createEmbedding({
-    //   deployment: "text-embedding-ada-002",
-    //   input
-    // },
-    // {
-    //   headers: {
-    //     "api-key": apikey,
-    //   },
-    //   params: {
-    //     "api-version": "2022-12-01",
-    //   },
-    // });
 
     const json = await res.json();
     const embedding = json.data[0].embedding;
