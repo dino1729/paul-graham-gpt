@@ -5,18 +5,18 @@ import fs from "fs";
 import { Configuration, OpenAIApi } from "openai";
 
 loadEnvConfig("");
-const apikey = process.env.AZURE_OPENAI_APIKEY;
-const baseurl = process.env.AZURE_OPENAI_ENDPOINT;
-const deploymentname = process.env.AZURE_OPENAI_DEPLOYMENT;
-let base_url = `${baseurl}openai/deployments/${deploymentname}`;
-//let url = `${baseurl}openai/deployments/${deploymentname}/embeddings?api-version=2022-12-01`;
+const openaiApiKey = process.env.AZURE_OPENAI_APIKEY!;
+const openaiEndpoint = process.env.AZURE_OPENAI_ENDPOINT!;
+const openaiEmbedding = process.env.AZURE_OPENAI_EMBEDDING!;
+const openaiVersion = process.env.AZURE_OPENAI_VERSION!;
+let base_url = `${openaiEndpoint}openai/deployments/${openaiEmbedding}`;
+
 
 const generateEmbeddings = async (essays: PGEssay[]) => {
-  //const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
-  //const openai = new OpenAIApi(configuration);
+
   const configuration = new Configuration({
     basePath: base_url,
-    apiKey: apikey,
+    apiKey: openaiApiKey,
   });
   const openai = new OpenAIApi(configuration);
 
@@ -31,15 +31,15 @@ const generateEmbeddings = async (essays: PGEssay[]) => {
       const { essay_title, essay_url, essay_date, essay_thanks, content, content_length, content_tokens } = chunk;
 
       const embeddingResponse = await openai.createEmbedding({
-        deployment: "text-embedding-ada-002",
+        model: openaiEmbedding,
         input: content
       },
       {
         headers: {
-          "api-key": apikey,
+          "api-key": openaiApiKey,
         },
         params: {
-          "api-version": "2022-12-01",
+          "api-version": openaiVersion,
         },
       });
 
@@ -62,7 +62,7 @@ const generateEmbeddings = async (essays: PGEssay[]) => {
       if (error) {
         console.log("error", error);
       } else {
-        console.log("saved", i, j);
+        console.log("saved", i, j, essay_title, content_tokens);
       }
 
       await new Promise((resolve) => setTimeout(resolve, 800));

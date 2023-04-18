@@ -1,5 +1,7 @@
 import { supabaseAdmin } from "@/utils";
-
+const openaiEndpoint = process.env.AZURE_OPENAI_ENDPOINT!;
+const openaiEmbedding = process.env.AZURE_OPENAI_EMBEDDING!;
+const openaiVersion = process.env.AZURE_OPENAI_VERSION!;
 export const config = {
   runtime: "edge"
 };
@@ -15,14 +17,16 @@ const handler = async (req: Request): Promise<Response> => {
 
     const input = query.replace(/\n/g, " ");
 
-    const res = await fetch("https://textllmapi.openai.azure.com/openai/deployments/text-embedding-ada-002/embeddings?api-version=2022-12-01", {
+    let url = `${openaiEndpoint}openai/deployments/${openaiEmbedding}/embeddings?api-version=${openaiVersion}`;
+
+    const res = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
         "api-key": apiKey
       },
       method: "POST",
       body: JSON.stringify({
-        deployment: "text-embedding-ada-002",
+        deployment: openaiEmbedding,
         input
       })
     });
