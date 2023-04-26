@@ -190,7 +190,7 @@ const chunkEssay = async (essay: PGEssay) => {
   }
 
   const json: PGJSON = {
-    current_date: "2023-03-01",
+    current_date: "2023-04-25",
     author: "Paul Graham",
     url: "http://www.paulgraham.com/articles.html",
     length: essays.reduce((acc, essay) => acc + essay.length, 0),

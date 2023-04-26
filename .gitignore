@@ -27,6 +27,11 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env*
+
+#scraped files
+/scripts/embeddings.csv
+/scripts/pg.json
 
 # vercel
 .vercel
