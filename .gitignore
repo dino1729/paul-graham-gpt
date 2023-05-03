@@ -43,3 +43,5 @@ next-env.d.ts
 # tsn
 tsn.json
 nohup.out
+package-lock.json
+```

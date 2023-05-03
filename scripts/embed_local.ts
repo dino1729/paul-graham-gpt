@@ -2,6 +2,7 @@ import { PGEssay, PGJSON } from "@/types";
 import { loadEnvConfig } from "@next/env";
 import fs from "fs";
 import { Configuration, OpenAIApi } from "openai";
+import stringify from "csv-stringify";
 
 loadEnvConfig("");
 const openaiApiKey = process.env.AZURE_OPENAI_APIKEY!;
@@ -19,9 +20,9 @@ const generateEmbeddings = async (essays: PGEssay[]) => {
   });
   const openai = new OpenAIApi(configuration);
 
-  const csv = fs.createWriteStream("scripts/embeddings.csv");
-
-  csv.write("essay_title,essay_url,essay_date,essay_thanks,content,content_length,content_tokens,embedding\n");
+  const csvStream = fs.createWriteStream("scripts/embeddings.csv", { flags: "w" });
+  const csvStringifier = stringify({ header: true });
+  csvStringifier.pipe(csvStream);
 
   for (let i = 0; i < essays.length; i++) {
     const section = essays[i];
@@ -48,13 +49,22 @@ const generateEmbeddings = async (essays: PGEssay[]) => {
 
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      csv.write(`${essay_title},${essay_url},${essay_date},${essay_thanks},${content},${content_length},${content_tokens},${embedding}\n`);
+      csvStringifier.write({
+        essay_title,
+        essay_url,
+        essay_date,
+        essay_thanks,
+        content,
+        content_length,
+        content_tokens,
+        embedding
+      });
 
       console.log("saved", i, j, essay_title, content_tokens);
     }
   }
 
-  csv.close();
+  csvStringifier.end();
 };
 
 (async () => {
